@@ -6,7 +6,6 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from ultralytics import YOLO
 
 from functions import PatchTransformer
 from functions import PatchApplier
@@ -15,12 +14,12 @@ from functions import SaliencyLoss
 from functions import NPSLoss
 from functions import TotalVariationLoss
 from functions import YOLODataset
-from functions import YOLOAnnotationTransformer
-from convert_visdrone_to_yolo import conv_visdrone_2_yolo
+
+from argparse import ArgumentParser
 
 # Configuration Class
 class cfg:
-    def __init__(self):
+    def __init__(self, visdrone_train_dir, log_dir = "."):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # Transformation
@@ -46,8 +45,8 @@ class cfg:
         self.patch_size = [64, 64]
 
         # Yolo Dataset
-        self.image_dir = "./dataset/visdrone_train/VisDrone2019-DET-train/images"
-        self.label_dir = "./dataset/visdrone_train/VisDrone2019-DET-train/yolo_annotations"
+        self.image_dir = os.path.join(visdrone_train_dir, "images")
+        self.label_dir = os.path.join(visdrone_train_dir, "labels")
         self.max_labels = 48
         self.model_in_sz = [640, 640]
         self.use_even_odd_images = "all"
@@ -68,7 +67,7 @@ class cfg:
         self.n_classes = 4
 
         # Logs
-        self.log_dir = "./logs/"
+        self.log_dir = os.path.join(log_dir, "logs")
         self.patch_save_epoch_freq = 1
         self.tensorboard_port = 8080
         self.patch_name = "base"
@@ -229,6 +228,11 @@ class myTrainer:
 
 
 if __name__ == "__main__":
-    mycfg = cfg()
+    parser = ArgumentParser(description="Run Pro Patch")
+    parser.add_argument("-data", "--data", type=str, required=True, help="Destination folder where the dataset will be loaded")
+    parser.add_argument("-logs", "--logs", type=str, required=True, default=".", help="Destination folder where the logs will be saved")
+    args = parser.parse_args()
+    
+    mycfg = cfg(visdrone_train_dir=args.data, log_dir=args.logs)
     trainer = myTrainer(mycfg)
     trainer.train()
