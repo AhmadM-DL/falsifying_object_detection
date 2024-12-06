@@ -1,7 +1,6 @@
 import gdown
 import os
 import zipfile
-from convert_visdrone_to_yolo import conv_visdrone_2_yolo
 from argparse import ArgumentParser
 
 def download_visdrone(destination):
@@ -26,5 +25,7 @@ if __name__=="__main__":
     parser = ArgumentParser(description="Download visdrone dataset to a specified destination.")
     parser.add_argument("-d", "--destination", type=str, required=True, help="Destination folder where the dataset will be downloaded.")
     args = parser.parse_args()
+    download_visdrone(args.destination)
+
     
     
