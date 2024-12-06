@@ -78,7 +78,7 @@ class myTrainer:
     def __init__(self, cfg):
         self.cfg = cfg
         self.dev = cfg.device
-        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True).eval()
+        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True, classes=cfg.n_classes).eval()
 
         self.patch_transformer = PatchTransformer(
             cfg.target_size_frac,
