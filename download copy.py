@@ -52,5 +52,6 @@ if __name__=="__main__":
     parser = ArgumentParser(description="Download visdrone dataset to a specified destination.")
     parser.add_argument("-d", "--destination", type=str, required=True, help="Destination folder where the dataset will be downloaded.")
     args = parser.parse_args()
+    download_visdrone(args.destination)
     
     
