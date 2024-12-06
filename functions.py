@@ -527,3 +527,77 @@ class YOLODataset(Dataset):
         else:
             padded_lab = label[: self.max_n_labels]
         return padded_lab
+    
+    
+# import os
+
+# class YOLOAnnotationTransformer:
+#     def __init__(self, class_id=0):
+#         """
+#         Initialize the YOLOAnnotationTransformer class.
+
+#         Args:
+#             class_id (int): Class ID for the object annotations (default: 0).
+#         """
+#         self.class_id = class_id
+
+#     def convert_to_yolo(self, image_width, image_height, bbox):
+#         """
+#         Convert bounding box from (x_min, y_min, x_max, y_max) to YOLO format.
+
+#         Args:
+#             image_width (int): Width of the image.
+#             image_height (int): Height of the image.
+#             bbox (tuple): Bounding box in pixel coordinates (x_min, y_min, x_max, y_max).
+
+#         Returns:
+#             str: YOLO-formatted annotation (class_id center_x center_y width height).
+#         """
+#         x_min, y_min, x_max, y_max = bbox
+#         center_x = (x_min + x_max) / 2 / image_width
+#         center_y = (y_min + y_max) / 2 / image_height
+#         width = (x_max - x_min) / image_width
+#         height = (y_max - y_min) / image_height
+#         return f"{self.class_id} {center_x:.6f} {center_y:.6f} {width:.6f} {height:.6f}"
+
+#     def transform_annotations_to_yolo(self, annotation_file, output_dir, image_width, image_height):
+#         """
+#         Transform annotations from pixel format to YOLO format and save to file.
+
+#         Args:
+#             annotation_file (str): Path to the annotation file containing bounding boxes.
+#             output_dir (str): Directory to save YOLO-format annotation files.
+#             image_width (int): Width of the corresponding image.
+#             image_height (int): Height of the corresponding image.
+#         """
+#         os.makedirs(output_dir, exist_ok=True)
+#         yolo_annotations = []
+#         with open(annotation_file, "r") as file:
+#             for line in file:
+#                 x_min, y_min, x_max, y_max = map(int, line.split(",")[:4])  # Adjust parsing as per your data format
+#                 yolo_annotations.append(
+#                     self.convert_to_yolo(image_width, image_height, (x_min, y_min, x_max, y_max))
+#                 )
+
+#         output_file = os.path.join(output_dir, os.path.basename(annotation_file))
+#         with open(output_file, "w") as file:
+#             file.write("\n".join(yolo_annotations))
+
+#     def batch_transform_to_yolo(self, annotation_dir, output_dir, image_size_dict):
+#         """
+#         Batch transform all annotation files in a directory to YOLO format.
+
+#         Args:
+#             annotation_dir (str): Directory containing annotation files in pixel format.
+#             output_dir (str): Directory to save YOLO-format annotation files.
+#             image_size_dict (dict): Dictionary mapping annotation filenames to (width, height) of images.
+#         """
+#         for annotation_file in os.listdir(annotation_dir):
+#             if annotation_file.endswith(".txt"):
+#                 image_width, image_height = image_size_dict[annotation_file]
+#                 self.transform_annotations_to_yolo(
+#                     os.path.join(annotation_dir, annotation_file),
+#                     output_dir,
+#                     image_width,
+#                     image_height
+#                 )

@@ -8,7 +8,6 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from ultralytics import YOLO
 
-# Replace with the actual implementations for these classes
 from functions import PatchTransformer
 from functions import PatchApplier
 from functions import MaxProbExtractor
@@ -16,10 +15,12 @@ from functions import SaliencyLoss
 from functions import NPSLoss
 from functions import TotalVariationLoss
 from functions import YOLODataset
+from functions import YOLOAnnotationTransformer
+from convert_visdrone_to_yolo import conv_visdrone_2_yolo
 
 # Configuration Class
 class cfg:
-    def _init_(self):
+    def __init__(self):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # Transformation
@@ -45,8 +46,8 @@ class cfg:
         self.patch_size = [64, 64]
 
         # Yolo Dataset
-        self.image_dir = "./data/visdrone/VisDrone2019-DET-train/images"
-        self.label_dir = "./data/visdrone/VisDrone2019-DET-train/labels"
+        self.image_dir = "./dataset/visdrone_train/VisDrone2019-DET-train/images"
+        self.label_dir = "./dataset/visdrone_train/VisDrone2019-DET-train/yolo_annotations"
         self.max_labels = 48
         self.model_in_sz = [640, 640]
         self.use_even_odd_images = "all"
@@ -54,7 +55,7 @@ class cfg:
         self.min_pixel_area = None
 
         # Visual Loss
-        self.triplet_printfile = "./30_rgb_triplets.csv"
+        self.triplet_printfile = "30_rgb_triplets.csv"
 
         # Training Loss
         self.loss_target = "obj*cls"
@@ -75,7 +76,7 @@ class cfg:
 
 # Trainer Class
 class myTrainer:
-    def _init_(self, cfg):
+    def __init__(self, cfg):
         self.cfg = cfg
         self.dev = cfg.device
         self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True).eval()
@@ -227,7 +228,7 @@ class myTrainer:
             print(f"Epoch {epoch} completed in {time.time() - start_time:.2f}s, Loss: {ep_loss}")
 
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     mycfg = cfg()
     trainer = myTrainer(mycfg)
     trainer.train()

@@ -1,28 +1,30 @@
 import gdown
 import os
 import zipfile
+from convert_visdrone_to_yolo import conv_visdrone_2_yolo
+from argparse import ArgumentParser
 
-# Ensure the directory exists
-directory = "C:/Users/noname/Desktop/me/aub/5.fall_24-25/eece_490/project/dataset/"
-os.makedirs(directory, exist_ok=True)
+def download_visdrone(destination):
+        
+    if not os.path.exists(destination):
+        raise Exception("Destination doesn't exist")
 
-# URLs with the file IDs
-file_urls = [
-    ('https://drive.google.com/uc?id=1iabGGSMVMQufGWzA8o3rFoBYXQLVTMFv', 'visdrone_train.zip'),
-    ('https://drive.google.com/uc?id=1iXBWbKVP5B7_X5QFDUasXu0U3weBIRpZ', 'visdrone_val.zip'),
-    ('https://drive.google.com/uc?id=1icc3r88LQGP-h6PSr9BYAfxlAVPdnGcO', 'visdrone_test.zip')
-]
+    train_url = 'https://drive.google.com/uc?id=1iabGGSMVMQufGWzA8o3rFoBYXQLVTMFv'
+    train_filename = 'visdrone_train.zip'
+    file_path = os.path.join(destination, train_filename)
+    print(f"Downloading {train_filename} from Google Drive...")
+    gdown.download(train_url, file_path, quiet=False)
 
-# Download and extract each file
-for url, filename in file_urls:
-    # Download the zip file
-    file_path = os.path.join(directory, filename)
-    gdown.download(url, file_path, quiet=False)
-
-    # Extract the downloaded zip file
-    print(f"Extracting {filename}...")
+    print(f"Extracting {train_filename}...")
     with zipfile.ZipFile(file_path, 'r') as zip_ref:
-        zip_ref.extractall(directory)  # Extract to the specified directory
-        print(f"{filename} extracted successfully.")
+        extract_dir = os.path.join(destination, "visdrone_train")
+        zip_ref.extractall(extract_dir)
+        print(f"{train_filename} extracted successfully.")
 
-print("Download and extraction completed!")
+if __name__=="__main__":
+    
+    parser = ArgumentParser(description="Download visdrone dataset to a specified destination.")
+    parser.add_argument("-d", "--destination", type=str, required=True, help="Destination folder where the dataset will be downloaded.")
+    args = parser.parse_args()
+    
+    
