@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 
 # Configuration Class
 class cfg:
-    def __init__(self, data_dir, weights_file, log_dir = "."):
+    def __init__(self, data_dir, weights_file, n_classes, log_dir = "."):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # Transformation
@@ -66,7 +66,7 @@ class cfg:
         self.n_epochs = 420
         self.start_lr = 0.03
         self.min_tv_loss = 0.1
-        self.n_classes = 4
+        self.n_classes = n_classes
         self.weights_file = weights_file
 
         # Logs
@@ -235,8 +235,10 @@ if __name__ == "__main__":
     parser.add_argument("-data", "--data", type=str, required=True, help="Destination folder where the dataset will be loaded")
     parser.add_argument("-logs", "--logs", type=str, required=True, default=".", help="Destination folder where the logs will be saved")
     parser.add_argument("-weights", "--weights", type=str, required=True, help="Weights of the pretrained model over the target dataset")
+    parser.add_argument("-nclasses", "--nclasses", type=str, required=True, help="Number of classes")
+
     args = parser.parse_args()
     
-    mycfg = cfg(data_dir=args.data, weights_file=args.weights, log_dir=args.logs)
+    mycfg = cfg(data_dir=args.data, weights_file=args.weights, n_classes=args.nclasses, log_dir=args.logs)
     trainer = myTrainer(mycfg)
     trainer.train()
