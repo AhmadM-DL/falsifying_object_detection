@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 
 # Configuration Class
 class cfg:
-    def __init__(self, data_dir, weights_file, n_classes, log_dir = "."):
+    def __init__(self, data_dir, weights_file, n_classes, patch_size= 32, log_dir = "."):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # Transformation
@@ -44,7 +44,7 @@ class cfg:
 
         # Patch
         self.patch_alpha = 1
-        self.patch_size = [64, 64]
+        self.patch_size = [patch_size, patch_size]
 
         # Yolo Dataset
         self.image_dir = os.path.join(data_dir, "images")
@@ -236,9 +236,10 @@ if __name__ == "__main__":
     parser.add_argument("-logs", "--logs", type=str, required=True, default=".", help="Destination folder where the logs will be saved")
     parser.add_argument("-weights", "--weights", type=str, required=True, help="Weights of the pretrained model over the target dataset")
     parser.add_argument("-nclasses", "--nclasses", type=int, required=True, help="Number of classes")
+    parser.add_argument("-patchsize", "--patchsize", type=int, required=True, help="Patch size")
 
     args = parser.parse_args()
     
-    mycfg = cfg(data_dir=args.data, weights_file=args.weights, n_classes=args.nclasses, log_dir=args.logs)
+    mycfg = cfg(data_dir=args.data, weights_file=args.weights, patch_size=args.patchsize, n_classes=args.nclasses, log_dir=args.logs)
     trainer = myTrainer(mycfg)
     trainer.train()
