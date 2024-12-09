@@ -235,7 +235,7 @@ if __name__ == "__main__":
     parser.add_argument("-data", "--data", type=str, required=True, help="Destination folder where the dataset will be loaded")
     parser.add_argument("-logs", "--logs", type=str, required=True, default=".", help="Destination folder where the logs will be saved")
     parser.add_argument("-weights", "--weights", type=str, required=True, help="Weights of the pretrained model over the target dataset")
-    parser.add_argument("-nclasses", "--nclasses", type=str, required=True, help="Number of classes")
+    parser.add_argument("-nclasses", "--nclasses", type=int, required=True, help="Number of classes")
 
     args = parser.parse_args()
     
