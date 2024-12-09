@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 def download_traffic(destination):
         
     if not os.path.exists(destination):
-        raise Exception("Destination doesn't exist")
+        raise Exception(f"Destination {destination} doesn't exist")
 
     url = 'https://drive.google.com/uc?id=14J8A8bPoQFlhz7zYWErvFdPc0icTFvuF'
     filename = 'traffic.zip'
