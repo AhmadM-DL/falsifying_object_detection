@@ -7,19 +7,21 @@ import torchvision.transforms as T
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from functions import PatchTransformer
-from functions import PatchApplier
-from functions import MaxProbExtractor
-from functions import SaliencyLoss
-from functions import NPSLoss
-from functions import TotalVariationLoss
-from functions import YOLODataset
+from classes import PatchTransformer
+from classes import PatchApplier
+from classes import MaxProbExtractor
+from classes import SaliencyLoss
+from classes import NPSLoss
+from classes import TotalVariationLoss
+from classes import YOLODataset
+
+from ultralytics_common_modules import DetectMultiBackend
 
 from argparse import ArgumentParser
 
 # Configuration Class
 class cfg:
-    def __init__(self, visdrone_train_dir, log_dir = "."):
+    def __init__(self, data_dir, weights_file, log_dir = "."):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # Transformation
@@ -45,8 +47,8 @@ class cfg:
         self.patch_size = [64, 64]
 
         # Yolo Dataset
-        self.image_dir = os.path.join(visdrone_train_dir, "images")
-        self.label_dir = os.path.join(visdrone_train_dir, "labels")
+        self.image_dir = os.path.join(data_dir, "images")
+        self.label_dir = os.path.join(data_dir, "labels")
         self.max_labels = 48
         self.model_in_sz = [640, 640]
         self.use_even_odd_images = "all"
@@ -65,9 +67,10 @@ class cfg:
         self.start_lr = 0.03
         self.min_tv_loss = 0.1
         self.n_classes = 4
+        self.weights_file = weights_file
 
         # Logs
-        self.log_dir = os.path.join(log_dir, "logs")
+        self.log_dir = log_dir
         self.patch_save_epoch_freq = 1
         self.tensorboard_port = 8080
         self.patch_name = "base"
@@ -78,7 +81,7 @@ class myTrainer:
     def __init__(self, cfg):
         self.cfg = cfg
         self.dev = cfg.device
-        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True, classes=cfg.n_classes).eval()
+        self.model = DetectMultiBackend(cfg.weights_file, device=self.dev, dnn=False, data=None, fp16=False).eval()
 
         self.patch_transformer = PatchTransformer(
             cfg.target_size_frac,
@@ -231,8 +234,9 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Run Pro Patch")
     parser.add_argument("-data", "--data", type=str, required=True, help="Destination folder where the dataset will be loaded")
     parser.add_argument("-logs", "--logs", type=str, required=True, default=".", help="Destination folder where the logs will be saved")
+    parser.add_argument("-weights", "--weights", type=str, required=True, help="Weights of the pretrained model over the target dataset")
     args = parser.parse_args()
     
-    mycfg = cfg(visdrone_train_dir=args.data, log_dir=args.logs)
+    mycfg = cfg(data_dir=args.data, weights_file=args.weights, log_dir=args.logs)
     trainer = myTrainer(mycfg)
     trainer.train()
